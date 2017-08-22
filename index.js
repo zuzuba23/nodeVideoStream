@@ -21,6 +21,10 @@ var server = app.listen(server_port, function(){
            + ", server_port " + server_port);
 });
 
+var video_dir = path.join(process.cwd(), 'video/');
+
+if (!fs.existsSync(video_dir))
+    fs.mkdirSync(video_dir);
 
 
 var io = require('socket.io')(server);
