@@ -1,0 +1,227 @@
+<html>
+	<head>
+		<script src="/js/socket.io.js"></script>
+		<script src="/js/jquery.min.js"></script>
+		<title>
+			Titlu
+		</title>
+	</head>
+	<body>
+		<!-- #### ROOM MANAGEMENT-->
+		<div id="roomManagement" hidden>
+			<h1 id="roomName">
+				Currently in lobby 
+			</h1>
+			<input type="text" id="createRoomInput" />
+			<button id="createRoom">
+				Create
+			</button>
+			<br>
+			<input type="text" id="joinRoomInput" />
+			<button id="joinRoom">
+				Join
+			</button>
+			<div id="userListDiv">
+
+			</div>
+		</div>
+		
+		<!-- #### USER/LOGIN -->
+		<div id="userDetails">
+			<input type="text" id="usernameInput" />
+			<button id="setUsername">Submit!</button>
+		</div>
+		
+		<!-- #### ROOM CONTROLS ADMINISTRATOR-->
+		<div id="adminMainControl" hidden>
+		<button id="leaveRoom">Leave</button>
+			<video id="videoPlayer" controls width="384" height="216">
+				<source src="" type="video/mp4" id="videoUrl">
+			</video>
+			<div id="videoControlls">
+				<button id="playVid">
+					Play
+				</button>
+				<button id="pauseVid">
+					Pause
+				</button>
+				
+				<input type="text" id="videoTime">
+					
+				</input>
+				<button id="changeVideoPosition">
+					GO!
+				</button>
+			</div>
+			<input type="text" id="ytLink" size="45" value="https://www.youtube.com/watch?v=u9Dg-g7t2l4">
+			
+			</input>
+			<button id="submYtLink">
+				OK
+			</button>
+			<br>
+			<p id="videoDownloadProgressStatus"></p>
+		</div>
+		
+	</body>
+	
+	<script>
+	
+		$(document).ready(function(){
+			var socket = io();
+			var username = '';
+			var room = '/';
+			
+			$('#playVid').click(function(){
+				socket.emit('playVid', 'newroom');
+			});
+			
+			$('#pauseVid').click(function(){
+				var position = $('#videoPlayer')[0].currentTime;
+				socket.emit('pauseVid',position);
+			});
+			
+			socket.on('pauseVid',function(time){
+				$('#videoPlayer')[0].pause();
+				$('#videoPlayer')[0].currentTime = time;
+				console.log($('#videoPlayer')[0].currentTime);
+			});
+			
+			socket.on('playVid',function(){
+				$('#videoPlayer')[0].play();
+				console.log('plkayay');
+			});
+			
+			socket.on('loadYTVideo', function(fileName){
+				var url = '/vids/' + fileName + '.mp4';
+				console.log(url);
+				$('#videoUrl').attr('src',url);
+				$('#videoPlayer')[0].load();
+			});
+			
+			$('#submYtLink').click(function(){
+				socket.emit('youtube', $('#ytLink').val());
+				$('#videoDownloadProgressStatus').html('Preparing...');
+			});
+			
+			$('#changeVideoPosition').click(function(){
+				var minsecs = $('#videoTime').val().split(':');
+				var time = parseInt(minsecs[0])*60 + parseInt(minsecs[1]);
+				socket.emit('changeVideoPosition',time);
+			});
+			
+			var video = document.getElementById('videoPlayer');
+			video.addEventListener('timeupdate', function() {
+				var mins = 0;
+				var secs = 0;
+				var currentTime = Math.floor(this.currentTime);
+				mins = Math.floor(currentTime / 60);
+				secs = currentTime - 60*mins;
+				$('#videoTime').val(mins + ':' + secs);
+			});
+			
+			$('#setUsername').click(function(){
+				socket.emit('registerUser',$('#usernameInput').val());
+			});
+			
+			socket.on('registerOk', function(name){
+				username = name;
+				room = 'lobby';
+			});
+			
+			socket.on('goToLobby',function(){
+				$('#userDetails').hide();
+				$('#adminMainControl').hide();
+				$('#roomManagement').show();
+				$('#roomName').html('Currently in lobby');
+				var url = '';
+				$('#videoUrl').attr('src',url);
+				$('#videoPlayer')[0].load();
+			});
+			
+			socket.on('connectedUsersList',function(data){
+				console.log(data);
+				var html = '<ul>';
+				data.forEach(function(item){
+					html += '<li>' + item + '</li>';
+				});
+				html += '</ul>';
+				$('#userListDiv').html(html);
+			});
+			
+			$('#createRoom').click(function(){
+				socket.emit('createRoom',$('#createRoomInput').val());
+			});
+			
+			$('#joinRoom').click(function(){
+				socket.emit('joinRoom',$('#joinRoomInput').val());
+			});
+			
+			$('#leaveRoom').click(function(){
+				socket.emit('leaveRoom', room);
+			});
+			
+			socket.on('createdRoom', function(roomName){
+				$('#roomName').html('Created room:' + roomName);
+				room = roomName;
+			});
+			
+			socket.on('joinedRoom', function(roomName){
+				$('#roomName').html('Joined room:' + roomName);
+				room = roomName;
+			});
+			
+			socket.on('userGoToRoom', function(roomName){
+				$('#userDetails').hide();
+				$('#roomManagement').hide();
+				$('#adminMainControl').show();
+			});
+			
+			socket.on('adminGoToRoom', function(roomName){
+				$('#userDetails').hide();
+				$('#roomManagement').hide();
+				$('#adminMainControl').show();
+			});
+			
+			socket.on('prepareForNewVideo', function(){
+				var url = '';
+				$('#videoUrl').attr('src',url);
+				$('#videoPlayer')[0].load();
+			});
+			
+			socket.on('getVideoDetailsForUserWhoJoined', function(data){
+				var details = {};
+				details.src = $('#videoUrl').attr('src');
+				details.time = $('#videoPlayer')[0].currentTime;
+				details.forUser = data;
+				details.videoPaused = $('#videoPlayer')[0].paused;
+				socket.emit('videoDetailsForUser',details);
+			});
+			
+			socket.on('joinedUserSync', function(details){
+				$('#videoUrl').attr('src', details.src);
+				$('#videoPlayer')[0].load();
+				$('#videoPlayer')[0].currentTime = details.time;
+				if (details.videoPaused == true) {
+					$('#videoPlayer')[0].pause(); 
+				}
+				else { 
+					$('#videoPlayer')[0].play();
+				} 
+			});
+			
+			socket.on('videoDownloadProgress', function(percent){
+				$('#videoDownloadProgressStatus').html('Progress:' + percent);
+			});
+			
+			socket.on('someError', function(data){
+				console.log(data);
+			});
+			
+			socket.on('test', function(data){
+				console.log(data)
+			});
+		});
+		
+	</script>
+</html>

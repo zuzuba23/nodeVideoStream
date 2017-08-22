@@ -1,0 +1,71 @@
+<html>
+	<head>
+		<script src="/js/socket.io.js"></script>
+		<script src="/js/jquery.min.js"></script>
+		<title>
+			Titlu
+		</title>
+	</head>
+	<body>
+
+		<video id="videoPlayer" controls width="384" height="216">
+			<source src="" type="video/mp4" id="videoUrl">
+		</video>
+
+		<button id="playVid">
+			Play
+		</button>
+		<button id="pauseVid">
+			Pause
+		</button>
+		
+		
+		<input type="text" id="ytLink" size="45" value="https://www.youtube.com/watch?v=u9Dg-g7t2l4">
+		
+		</input>
+		<button id="submYtLink">
+			OK
+		</button>
+	
+	</body>
+	
+	<script>
+	
+		$(document).ready(function(){
+			var socket = io();
+			socket.emit('salut');
+			
+			$('#playVid').click(function(){
+				socket.emit('playVid');
+			});
+			
+			$('#pauseVid').click(function(){
+				var position = $('#videoPlayer')[0].currentTime;
+				socket.emit('pauseVid',position);
+			});
+			
+			socket.on('pauseVid',function(time){
+				$('#videoPlayer')[0].pause();
+				$('#videoPlayer')[0].currentTime = time;
+				console.log($('#videoPlayer')[0].currentTime);
+			});
+			
+			socket.on('playVid',function(){
+				$('#videoPlayer')[0].play();
+			});
+			
+			socket.on('loadYTVideo', function(fileName){
+				var url = 'http://localhost:3000/video/' + fileName;
+				console.log(url);
+				$('#videoUrl').attr('src',url);
+				$('#videoPlayer')[0].load();
+			});
+			
+			$('#submYtLink').click(function(){
+				socket.emit('youtube', $('#ytLink').val());
+			});
+			
+		});
+		
+	</script>
+</html>

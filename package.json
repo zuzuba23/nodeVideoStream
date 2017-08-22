@@ -1,0 +1,23 @@
+{
+  "name": "videoStreamer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+	"start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zuzuba",
+  "license": "ISC",
+  "dependencies": {
+    "client-sessions": "^0.8.0",
+    "express": "^4.15.4",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "socket.io": "^2.0.3",
+    "socket.io-stream": "^0.9.1",
+    "util": "^0.10.3",
+    "youtube-dl": "^1.11.1",
+    "ytdl": "^0.7.0"
+  }
+}
