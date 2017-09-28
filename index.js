@@ -10,9 +10,12 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use('/vids', express.static(__dirname + '/video'));
 app.use('/js', express.static(__dirname + '/public/js'));
+app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
+app.use('/css', express.static(__dirname + '/public/css')); // redirect CSS bootstrap
+app.use('/fonts', express.static(__dirname + '/public/fonts'));
 
 app.get('/', function(req,res){
-	res.sendFile(__dirname + '/views/user1.html');
+	res.sendFile(__dirname + '/views/user1Boot.html');
 });
 
 var server_port = process.env.PORT || 8080;
@@ -87,25 +90,34 @@ io.on('connection',function(socket){
 		io.to(socket.roomName).emit('pauseVid',time);
 	});
 	
+	//##### getRoomList event
+	socket.on('getRoomList',function(){
+		socket.emit('hereAreTheRooms', rooms);
+	});
+	
 	socket.on('salut',function(){
 		console.log('socket says hi');
-		io.to('lobby').emit('test','hello to all from lobby');
+		io.to('lobby').emit('test','hello to all in lobby');
 	});
 	//##### youtube link input
 	socket.on('youtube',function(ytLink){
 		if(socket.roomName != 'lobby'){	//must check if watched another one before. if so, delete that one
-			io.to(socket.roomName).emit('prepareForNewVideo');
-			if(socket.video != ''){
-				fs.unlink(__dirname + '/video/' + socket.video + '.mp4');
+			if(socket.roomAdmin == true){
+				io.to(socket.roomName).emit('prepareForNewVideo');
+				if(socket.video != ''){
+					fs.unlink(__dirname + '/video/' + socket.video + '.mp4');
+				}
+				console.log('sbd upload');
+				var videoName = Date.now();
+				downloadYTVideo(ytLink,videoName, socket.roomName);
+			} else {
+				socket.emit('someError','Only the administrator of the room can change the video. Make another room :D');
 			}
-			console.log('sbd upload');
-			var videoName = Date.now();
-			downloadYTVideo(ytLink,videoName, socket.roomName);
 		} else{ //user can't play link here
 			socket.emit('someError','You can\'t play videos here.');
 		}
 	});
-	
+	//#### userRegister event
 	socket.on('registerUser',function(name){
 		var userExists = 0;
 		users.forEach(function(item){
@@ -118,7 +130,7 @@ io.on('connection',function(socket){
 			socket.join('lobby');
 			socket.emit('registerOk', name);
 			socket.emit('goToLobby');
-			io.to('lobby').emit('connectedUsersList', getConnectedUsersFromRoom('lobby'));
+			//io.to('lobby').emit('connectedUsersList', getConnectedUsersFromRoom('lobby'));	same here. won't show it in lobby
 		} else{
 			socket.emit('someError', 'User already registered');
 		}
@@ -139,8 +151,8 @@ io.on('connection',function(socket){
 				socket.roomAdmin = true;
 				socket.video = '';
 				socket.emit('adminGoToRoom', roomName);
-				io.to('lobby').emit('connectedUsersList', getConnectedUsersFromRoom('lobby'));
-				io.to(roomName).emit('createdRoom', roomName);
+				io.to('lobby').emit('newRoomCreated', roomName);
+				//io.to('lobby').emit('connectedUsersList', getConnectedUsersFromRoom('lobby'));
 				io.to(roomName).emit('connectedUsersList', getConnectedUsersFromRoom(roomName));
 			} else{
 				socket.emit('someError', 'Room already exists');
@@ -160,8 +172,7 @@ io.on('connection',function(socket){
 				socket.video = '';
 				socket.roomAdmin = false;
 				socket.emit('userGoToRoom', roomName);
-				io.to('lobby').emit('connectedUsersList', getConnectedUsersFromRoom('lobby'));
-				io.to(roomName).emit('joinedRoom', roomName);
+				//io.to('lobby').emit('connectedUsersList', getConnectedUsersFromRoom('lobby'));
 				io.to(roomName).emit('connectedUsersList', getConnectedUsersFromRoom(roomName));
 				
 				// Must get video details from room
@@ -207,7 +218,8 @@ function userLeaveRoom(roomName, socket){
 	socket.join('lobby');
 	socket.roomName = 'lobby';
 	socket.emit('goToLobby');
-	io.to('lobby').emit('connectedUsersList', getConnectedUsersFromRoom('lobby'));
+	io.to(roomName).emit('connectedUsersList', getConnectedUsersFromRoom(roomName));
+	//io.to('lobby').emit('connectedUsersList', getConnectedUsersFromRoom('lobby')); don't need to tell the lobby it's connected users but...i won't delete this
 	
 	var usersInRoom = 0;
 	users.forEach(function(item){
@@ -220,6 +232,7 @@ function userLeaveRoom(roomName, socket){
 		if (fs.existsSync(__dirname + '/video/' + socket.video + '.mp4')) {	//check if file exists...maybe it never existed
 			fs.unlink(__dirname + '/video/' + socket.video + '.mp4');
 		}
+		io.to('lobby').emit('removeRoom', roomName);
 	}
 }
 
@@ -230,7 +243,7 @@ function downloadYTVideo(url, videoName, roomName){
 	var pos = 0;
 	var size = 0;
 	// Will be called when the download starts. 
-	video.on('info', function(info) {
+	video.on('info', function(err, info) {
 		console.log('Download started');
 		console.log('filename: ' + info._filename);
 		console.log('size: ' + info.size);
