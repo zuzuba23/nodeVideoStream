@@ -243,7 +243,7 @@ function downloadYTVideo(url, videoName, roomName){
 	var pos = 0;
 	var size = 0;
 	// Will be called when the download starts. 
-	video.on('info', function(err, info) {
+	video.on('info', function(info) {
 		console.log('Download started');
 		console.log('filename: ' + info._filename);
 		console.log('size: ' + info.size);
