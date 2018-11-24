@@ -16,7 +16,7 @@
 		<link rel="stylesheet" href="/css/bootstrap-slider.css">
 		<link rel="stylesheet" href="/css/custom.css">
 		<title>
-			Titlu
+			WWM
 		</title>
 		<style>
 		
@@ -35,29 +35,23 @@
 						<span class="icon-bar"></span>
 					</button>
 					<a class="navbar-brand" href="#">
-						WatchWithMe
+						Watch With Me
 					</a>
 				</div>
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li class="active">
+					<!-- <ul class="nav navbar-nav">
+						 <li class="active">
 							<a href="#">
 								Home 
 								<span class="sr-only">
 									(current)
 								</span>
 							</a>
-						</li>
-						<li>
-							<a href="#" id="title2">
-								
-							</a>
-						</li>
-					</ul>
+						</li> 
+					</ul> -->
 					<ul class="nav navbar-nav navbar-right">
 						<li>
-							<a href="#">
-								Something here
+							<a href="#" id="title2">
 							</a>
 						</li>
 					</ul>
@@ -68,10 +62,11 @@
 		
 		
 		<!--	BODY CONTAINER	-->
-		<div class="container" style="background-color:#99bbff;">
+		<div class="container" id="mainContainer" style="background-color:#99bbff;">
 			<!--	LOGIN	-->
 			<div class="row" id="userDetails">
-				<div class="form-group col-md-4">
+				<div class="col-md-4"></div>
+				<div class="form-group col-md-4 offset-md-4">
 					<label class="control-label">Username</label>
 					<div class="input-group">
 						<input type="text" class="form-control" id="usernameInput" placeholder="Type username here..." />
@@ -118,33 +113,70 @@
 			<!--	ROOM	-->
 			<div class="row" style="margin-left:1%;" hidden id="adminMainControl">
 				<div class="row">
-					<div class="col-md-11">
-						<h1 id="roomName">
-							Currently in room x
-						</h1>
-					</div>
-					<div class="col-md-1">
-						<button id="leaveRoom" class="btn btn-warning">
-							Leave
-						</button>
-					</div>
-				</div>
-				<div class="row">
 					<div class="col-md-8">
 						<div class="panel panel-primary">
 							<div class="panel-heading">
-								<h3 class="panel-title">
-									Video goes here.
-								</h3>
+								<div class="row" id="adminPanel" hidden>
+									<div class="col-md-12">
+										<div class="row">
+											<div class="col-md-11">
+												<input type="text" id="ytLink" style="width:100%;" class="form-control" value="https://www.youtube.com/watch?v=LODkVkpaVQA">
+												</input>
+											</div>
+											<div class="col-md-1">
+												<button id="submYtLink" class="btn btn-primary">
+													GO
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-11" id="videoDownloadProgressStatus"> </div>
+								</div>
 							</div>
-							<div class="panel-body">
+							<div class="panel-body" id="videoPanel">
 								<video id="videoPlayer" style="width:100%" controls="false">
 									<source src="" type="video/mp4" id="videoUrl">
 								</video>
+								<div id="videoBarContainer">
+									<div id="videoBar">
+										<div class="col-md-8">
+											<button id="playVid" class="glyphicon glyphicon-play"></button>
+											<button id="pauseVid" class="glyphicon glyphicon-pause"></button> 
+											
+											<button id="volumeBtn" class="glyphicon glyphicon-volume-down"></button>
+											<input id="volumeSlider" data-slider-id='volumeSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50"></input>
+										</div>
+										
+										<div class="col-md-4">
+											<input type="text" id="videoTime" size="8" class="form-control"></input>
+											<button id="changeVideoPosition" class="glyphicon glyphicon-play-circle"></button>
+
+											<button id="fullscreenBtn" class="glyphicon glyphicon-fullscreen"></button>
+										</div>
+										
+										
+										
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
 					<div class="col-md-4">
+						<div class="row">
+							<div class="col-md-9">
+								<h2 id="roomName">
+									Currently in room x
+								</h2>
+							</div>
+							<div class="col-md-3">
+								<button id="leaveRoom" class="btn btn-warning">
+									Leave
+								</button>
+							</div>
+						</div>
+
 						<div class="panel panel-primary">
 							<div class="panel-heading">
 								<h3 class="panel-title">
@@ -160,58 +192,6 @@
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="row">
-							<div class="col-md-3">
-								<button id="playVid" class="btn btn-primary">
-									Play
-								</button>
-
-
-								<button id="pauseVid" class="btn btn-primary">
-									Pause
-								</button>
-								
-								<button id="fullscreenBtn" class="btn btn-primary">
-									FullScreen
-								</button>
-							</div>
-							<div class="col-md-2">	
-								<input type="text" id="videoTime" size="8" class="form-control" style="display:inline;width:60%;"/>
-								<button id="changeVideoPosition" class="btn btn-primary">
-									GO!
-								</button>
-							</div>
-							<div class="col-md-5">
-								<input id="volumeSlider" data-slider-id='volumeSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50"/>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-				<div class="row" id="adminPanel" hidden>
-					<div class="col-md-12">
-						<div class="row">
-							<div class="col-md-4">
-								<input type="text" id="ytLink" style="width:100%;" class="form-control" value="https://www.youtube.com/watch?v=LODkVkpaVQA">
-					
-								</input>
-							</div>
-							<div class="col-md-1">
-								<button id="submYtLink" class="btn btn-primary">
-									OK
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-8" id="videoDownloadProgressStatus">
-						
-					</div>
-					
 				</div>
 			</div>
 			<!--	ROOM END	-->
@@ -240,7 +220,7 @@
 		<!--	ERROR MODAL END	-->
 		
 		
-		<!--	FOOTER	-->
+		<!--	FOOTER
 		<footer class="footer navbar-fixed-bottom">
 			<div class="container">
 				<span class="text-muted">
@@ -248,7 +228,7 @@
 				</span>
 			</div>
 		</footer>
-		<!--	FOOTER END	-->
+			FOOTER END	-->
 		
 	</body>
 	
@@ -258,6 +238,7 @@
 		
 		function SetVolume(val){
 			$('#videoPlayer').prop('volume', val / 100);
+			$('#volumeSlider').prop('volume', val / 100);
 		}
 		var slider = $('#volumeSlider').slider({
 				formatter: function(value) {
@@ -332,7 +313,7 @@
 				$('#adminMainControl').show();
 				$('#adminPanel').show();
 				
-				$('#roomName').html('Created room:' + roomName);
+				$('#roomName').html('Room ' + roomName);
 				room = roomName;
 			});
 			
@@ -524,4 +505,6 @@
 			}, 1000);
 		});
 	</script>
+	
+	<script src="/js/custom.js"></script>
 </html>

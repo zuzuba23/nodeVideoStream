@@ -26,6 +26,7 @@ video::-webkit-media-controls {
   list-style-type: none;
   margin: 0;
   padding: 0;
+  overflow: auto;
 }
  
 #userList li {
@@ -53,4 +54,104 @@ video::-webkit-media-controls {
 #userList li a:hover {
   font-size: 30px;
   background: #f6f6f6;
+}
+
+#mainContainer{
+	padding: 15px 20px;
+	width: 90%;
+}
+
+#adminMainControl{
+	max-height:95vh;
+	margin: 0 !important;
+}
+
+#videoBarContainer{
+	/*display: none;*/
+}
+
+#submYtLink{
+	margin-left: -15px;
+}
+
+#videoTime{
+	width: 60px;
+}
+
+#volumeSlider{
+	width:100px;
+}
+
+#videoPanel{
+	position: relative;
+}
+
+#videoBar{
+	display: inline-flex;
+	position: absolute;
+	bottom: -1px;
+	background: linear-gradient( transparent, black );
+	margin-left: -16px;
+    width: calc(100% + 2px);
+}
+
+#videoBar div{
+	display: inline-flex;
+}
+
+#videoBar button, #videoBar span{
+	border: none;
+    background: none;
+    color: white;
+	height: 40px;
+    width: 45px;
+	text-align: center;
+    font-size: 25px;
+	cursor: pointer;
+}
+
+#videoBar button:hover{
+	color: #337ab7;
+}
+
+#videoBar input{
+	height: 30px;
+    padding: 3px;
+    width: 45px;
+    border: none;
+    background: transparent;
+    color: white;
+    font-weight: bold;
+}
+
+#videoBar div#volumeSlider{
+	margin: 10px 0px;
+	display: none;
+}
+
+#videoTime{
+	margin: 8px 0px;
+    height: 22px !important;
+}
+
+#leaveRoom, #roomName{
+	margin-top: 12px;
+    margin-bottom: 10px;
+}
+
+#roomName{
+	overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+#fullscreenBtn{
+	margin-left: auto;
+}
+
+.progress{
+	text-align: center;
+    margin: 5px 0 0 0;
+    height: 15px;
+    color: rgb(27, 141, 206);
+    font-size: 12px;
 }
